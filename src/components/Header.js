@@ -23,12 +23,12 @@ export const Header = () => {
           style={{ textDecoration: "none" }}
           to="/"
         >
-          <Typography variant="h5" color="secondary">
+          <Typography variant="h5">
             Pokemon App
           </Typography>
         </Link>
         <Link style={{ textDecoration: "none" }} to="/myPokemon">
-          <Button variant="contained" size="large" color="secondary">
+          <Button variant="contained" color="secondary">
             My Pokemon
           </Button>
         </Link>

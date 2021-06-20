@@ -1,49 +1,21 @@
 import React from "react";
-import { withStyles, makeStyles } from "@material-ui/core/styles";
+import { withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableContainer from "@material-ui/core/TableContainer";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import Paper from "@material-ui/core/Paper";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
 import Skeleton from "@material-ui/lab/Skeleton";
 import { gql, useQuery } from "@apollo/client";
 import { Link } from "react-router-dom";
 import Alert from "@material-ui/lab/Alert";
+import Grid from "@material-ui/core/Grid";
 
-const StyledTableCell = withStyles((theme) => ({
-  head: {
-    backgroundColor: "#FF0000",
-    color: theme.palette.common.white,
-  },
-  body: {
-    fontSize: 14,
-  },
-}))(TableCell);
-
-const StyledTableRow = withStyles((theme) => ({
+const StyleCard = withStyles({
   root: {
-    "&:nth-of-type(odd)": {
-      backgroundColor: theme.palette.action.hover,
-    },
+    borderRadius: 10,
+    transition: "transform 0.15s ease-in-out",
+    "&:hover, &:focus": { transform: "scale3d(1.03, 1.03, 1)" },
   },
-}))(TableRow);
-
-const useStyles = makeStyles({
-  table: {
-    minWidth: 700,
-    borderRadius: 15,
-  },
-  detailLink: {
-    color: "#FF0000",
-    "&:hover, &:focus": {
-      fontWeight: "bold",
-      cursor: "pointer",
-    },
-  },
-});
+})(Card);
 
 const GET_POKEMONS = gql`
   query pokemons($limit: Int, $offset: Int) {
@@ -68,59 +40,78 @@ const gqlVariables = {
 };
 
 export default function PokemonsTable() {
-  const { loading, error, data } = useQuery(GET_POKEMONS, {
+  const { error, loading, data } = useQuery(GET_POKEMONS, {
     variables: gqlVariables,
   });
-  const classes = useStyles();
+
+  let myData = [];
+  if (typeof localStorage !== "undefined") {
+    myData = JSON.parse(localStorage.getItem("pokemon_history"));
+  } else {
+    myData = [];
+  }
 
   if (loading)
     return (
-      <div>
-        <Skeleton variant="text" width={350} height={60} />
-        <Skeleton variant="text" height={350} />
-      </div>
+      <Grid item xs={6}>
+        <Card>
+          <CardContent>
+            <Skeleton width="20%"></Skeleton>
+            <Skeleton width="30%">
+              <Typography gutterBottom>.</Typography>
+            </Skeleton>
+            <Skeleton width="15%"></Skeleton>
+            <Skeleton width="5%"></Skeleton>
+          </CardContent>
+        </Card>
+      </Grid>
     );
   if (error) return <Alert severity="error">Something Wrong!</Alert>;
 
+  let newData = JSON.parse(JSON.stringify(data.pokemons.results));
+
+  const countPokemon = (arr, val) =>
+    arr.reduce((a, v) => (v.pokemon_name === val ? a + 1 : a), 0);
+
+  if (myData != null) {
+    for (var i = 0; i < newData.length; i++) {
+      var detail = newData[i];
+      Object.assign(detail, { own: countPokemon(myData, detail.name) });
+    }
+  }
+
   return (
-    <>
-      <Typography variant="h5" color="inherit" className={classes.title}>
-        List of Pokemon
-      </Typography>
-      <TableContainer component={Paper}>
-        <Table className={classes.table} aria-label="customized table">
-          <TableHead>
-            <TableRow>
-              <StyledTableCell>No</StyledTableCell>
-              {/* <StyledTableCell>Image</StyledTableCell> */}
-              <StyledTableCell>Pokemon Name</StyledTableCell>
-              <StyledTableCell align="right">Owned Total</StyledTableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.pokemons.results.map((pokemon, index) => (
-              <StyledTableRow key={pokemon.name}>
-                <StyledTableCell component="th" scope="row">
-                  {index + 1}
-                </StyledTableCell>
-                {/* <StyledTableCell>
-                  <img src={pokemon.image} alt={pokemon.name} />
-                </StyledTableCell> */}
-                <StyledTableCell>
-                  <Link
-                    to={`/detail/${pokemon.name}`}
-                    className={classes.detailLink}
-                    style={{ textDecoration: "none" }}
-                  >
-                    {pokemon.name}
-                  </Link>
-                </StyledTableCell>
-                <StyledTableCell align="right">0</StyledTableCell>
-              </StyledTableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </>
+    <Grid container spacing={3}>
+      {newData.map((pokemon) => (
+        <Grid item xs={12} sm={6} key={pokemon.name}>
+          <Link
+            to={`/detail/${pokemon.name}`}
+            style={{ textDecoration: "none" }}
+          >
+            <StyleCard>
+              <CardContent>
+                <Typography variant="caption" color="textSecondary">
+                  Pokemon
+                </Typography>
+                <Typography
+                  variant="h5"
+                  component="p"
+                  color="secondary"
+                  gutterBottom
+                >
+                  {pokemon.name}
+                </Typography>
+                <Typography variant="caption" color="textSecondary">
+                  Owned Total
+                </Typography>
+                <Typography variant="h6" component="p">
+                  {pokemon.own != null ? pokemon.own : "0"}
+                </Typography>
+              </CardContent>
+            </StyleCard>
+          </Link>
+        </Grid>
+      ))}
+    </Grid>
   );
 }
