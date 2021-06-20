@@ -18,14 +18,13 @@ export const Header = () => {
   return (
     <AppBar position="static">
       <Toolbar>
+        <img src="pikachu.png" alt="pikachu" width={30} />
         <Link
           className={classes.title}
           style={{ textDecoration: "none" }}
           to="/"
         >
-          <Typography variant="h5">
-            Pokemon App
-          </Typography>
+          <Typography variant="h5">Pokemon App</Typography>
         </Link>
         <Link style={{ textDecoration: "none" }} to="/myPokemon">
           <Button variant="contained" color="secondary">
