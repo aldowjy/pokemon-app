@@ -60,17 +60,16 @@ const getLocalStorage = () => {
 };
 
 function PokemonList() {
-  const [pokemons, setPokemons] = useState(defaultPokemons);
-  const [page, setPage] = useState(0);
-  const [isLoading, setLoading] = useState(false);
-  const [isError, setError] = useState(false);
+  const [pokemons] = useState(defaultPokemons);
+  // const [page, setPage] = useState(0);
+  // const [isLoading, setLoading] = useState(false);
+  // const [isError, setError] = useState(false);
   const myData = getLocalStorage();
 
   const { loading, error, data } = useQuery(GET_POKEMONS, {
     variables: gqlVariables,
   });
 
-  console.log("TEST", pokemons);
   if (loading)
     return (
       <Grid item xs={6}>

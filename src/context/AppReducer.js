@@ -1,29 +1,28 @@
-export default function appReducer(state, action) {
+function appReducer(state, action) {
   const CACHE_KEY = "pokemon_history";
-  function checkForStorage() {
-    return typeof Storage !== "undefined";
-  }
 
   function putHistory(data) {
-    if (checkForStorage()) {
+    if (typeof Storage !== "undefined") {
       let historyData = null;
+
       if (localStorage.getItem(CACHE_KEY) === null) {
         historyData = [];
       } else {
         historyData = JSON.parse(localStorage.getItem(CACHE_KEY));
       }
+
       historyData.unshift(data);
       localStorage.setItem(CACHE_KEY, JSON.stringify(historyData));
     }
   }
 
-  function showHistory() {
-    if (checkForStorage) {
+  const getHistory = () => {
+    if (typeof Storage !== "undefined") {
       return JSON.parse(localStorage.getItem(CACHE_KEY)) || [];
     } else {
       return [];
     }
-  }
+  };
 
   switch (action.type) {
     case "ADD_POKEMON":
@@ -35,37 +34,31 @@ export default function appReducer(state, action) {
       };
 
       putHistory(params);
-      const historyData = showHistory();
 
       return {
         ...state,
-        pokemons: [...state.pokemons, historyData],
+        pokemons: [...state.pokemons, getHistory()],
       };
     case "REMOVE_POKEMON":
-      const new_data = JSON.parse(localStorage.getItem(CACHE_KEY));
+      const newData = JSON.parse(localStorage.getItem(CACHE_KEY));
       let item = [];
 
-      for (var i = 0; i < new_data.length; i++) {
-        item = new_data[i];
+      for (var i = 0; i < newData.length; i++) {
+        item = newData[i];
         if (item.nick_name === action.payload) {
-          new_data.splice(i, 1);
+          newData.splice(i, 1);
         }
       }
 
-      localStorage.setItem(CACHE_KEY, JSON.stringify(new_data));
-      const historyNewData = showHistory();
+      localStorage.setItem(CACHE_KEY, JSON.stringify(newData));
 
       return {
         ...state,
-        pokemons: [...state.pokemons, historyNewData],
+        pokemons: [...state.pokemons, getHistory()],
       };
-    // return {
-    //   ...state,
-    //   pokemons: state.pokemons.filter(
-    //     (pokemon) => pokemon.id !== action.payload
-    //   ),
-    // };
     default:
       return state;
   }
 }
+
+export default appReducer;

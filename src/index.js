@@ -3,31 +3,11 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
-import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
+import { ApolloProvider } from "@apollo/client";
+import { MuiThemeProvider } from "@material-ui/core/styles";
+import { theme } from "./utils/customTheme";
+import { client } from "./grapql/schema/pokemonSchema";
 import { BrowserRouter as Router } from "react-router-dom";
-
-const client = new ApolloClient({
-  uri: "https://graphql-pokeapi.vercel.app/api/graphql",
-  cache: new InMemoryCache(),
-});
-
-const theme = createMuiTheme({
-  palette: {
-    primary: {
-      light: "#FFFF33",
-      main: "#FFE36B",
-      dark: "#CC972F",
-      contrastText: "#000",
-    },
-    secondary: {
-      light: "#FF3333",
-      main: "#91411C",
-      dark: "#72391C",
-      contrastText: "#FFF",
-    },
-  },
-});
 
 ReactDOM.render(
   <React.StrictMode>

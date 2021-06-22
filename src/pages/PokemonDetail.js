@@ -1,5 +1,4 @@
-import React, { useContext, useState } from "react";
-import clsx from "clsx";
+import React, { useState, useEffect, useRef } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
@@ -7,21 +6,13 @@ import Chip from "@material-ui/core/Chip";
 import Skeleton from "@material-ui/lab/Skeleton";
 import Typography from "@material-ui/core/Typography";
 import { gql, useQuery } from "@apollo/client";
-import { GlobalContext } from "../context/GlobalState";
 import Alert from "@material-ui/lab/Alert";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import TextField from "@material-ui/core/TextField";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import { DialogAdd } from "../components/DialogAdd";
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-  },
   paper: {
     padding: theme.spacing(2),
     margin: "auto",
@@ -77,94 +68,41 @@ const GET_DETAIL = gql`
   }
 `;
 
-const checkData = (nick_name) => {
-  const check_data = JSON.parse(localStorage.getItem("pokemon_history"));
-  let check_item = [];
-  let exist = false;
-
-  if (check_data != null) {
-    for (var i = 0; i < check_data.length; i++) {
-      check_item = check_data[i];
-      if (check_item.nick_name === nick_name) {
-        exist = true;
-      }
-    }
-  }
-
-  return exist;
-};
-
 const PokemonDetail = (route) => {
   const classes = useStyles();
-  const { addPokemon } = useContext(GlobalContext);
+  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
-  const [nickname, setNickName] = useState("");
-  const [loading, setLoading] = React.useState(false);
-  const [success, setSuccess] = React.useState(false);
-  const timer = React.useRef();
-
-  const buttonClassname = clsx({
-    [classes.buttonSuccess]: success,
-  });
-
-  React.useEffect(() => {
-    return () => {
-      clearTimeout(timer.current);
-    };
-  }, []);
-
+  const timer = useRef();
   const { server_loading, error, data } = useQuery(GET_DETAIL, {
     variables: {
       name: route.match.params.name,
     },
   });
 
+  useEffect(() => {
+    return () => {
+      clearTimeout(timer.current);
+    };
+  }, []);
+
   const handleClickOpen = () => {
     const caught = Math.random() < 0.5;
 
     if (!loading) {
-      setSuccess(false);
       setLoading(true);
 
       timer.current = window.setTimeout(() => {
-        setSuccess(true);
         setLoading(false);
 
         if (caught) {
           alert("Berhasil");
           setOpen(true);
         } else {
-          alert("Coba Lagi");
+          alert("Gagal");
           setOpen(false);
         }
-      }, 2000);
+      }, 0);
     }
-  };
-
-  const handleSubmit = () => {
-    if (nickname === "") {
-      alert("Nickname is Required!");
-      return;
-    }
-
-    let checked = checkData(nickname);
-    if (checked) {
-      alert("Nickname cant be same!");
-      return;
-    }
-
-    const params = {
-      id: data.pokemon.id,
-      nickname: nickname,
-      pokemonname: data.pokemon.name,
-    };
-
-    addPokemon(params);
-    setOpen(false);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
   };
 
   if (server_loading)
@@ -188,13 +126,17 @@ const PokemonDetail = (route) => {
     );
   if (error) return <Alert severity="error">Something Wrong!</Alert>;
 
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   if (data && data.pokemon) {
     const {
       pokemon: { name, sprites, types, moves },
     } = data;
 
     return (
-      <div className={classes.root}>
+      <>
         <Paper className={classes.paper}>
           <Grid container spacing={3}>
             <Grid item>
@@ -216,22 +158,28 @@ const PokemonDetail = (route) => {
                   >
                     {name}
                   </Typography>
-
                   <Typography variant="body2" gutterBottom>
                     Type
                   </Typography>
                   <Box className={classes.pos}>
-                    {types.map((type) => (
-                      <Chip label={type.type.name} style={{ margin: "3px" }} />
+                    {types.map((type, index) => (
+                      <Chip
+                        key={index}
+                        label={type.type.name}
+                        style={{ margin: "3px" }}
+                      />
                     ))}
                   </Box>
-
                   <Typography variant="body2" gutterBottom>
                     Move
                   </Typography>
                   <Box className={classes.pos}>
-                    {moves.map((move) => (
-                      <Chip label={move.move.name} style={{ margin: "3px" }} />
+                    {moves.slice(0, 10).map((move, index) => (
+                      <Chip
+                        key={index}
+                        label={move.move.name}
+                        style={{ margin: "3px" }}
+                      />
                     ))}
                   </Box>
                 </Grid>
@@ -242,7 +190,6 @@ const PokemonDetail = (route) => {
                 <Button
                   variant="contained"
                   color="secondary"
-                  className={buttonClassname}
                   disabled={loading}
                   onClick={() => handleClickOpen()}
                   fullWidth
@@ -259,39 +206,8 @@ const PokemonDetail = (route) => {
             </Grid>
           </Grid>
         </Paper>
-
-        <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog">
-          <DialogTitle id="form-dialog">Enter Nickname</DialogTitle>
-          <DialogContent>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleSubmit();
-              }}
-            >
-              <TextField
-                error
-                autoFocus
-                id="nickName"
-                label="Nickname"
-                value={nickname}
-                type="text"
-                helperText="Nickname is required!"
-                onInput={(e) => setNickName(e.target.value)}
-                fullWidth
-              />
-              <DialogActions>
-                <Button onClick={handleClose} color="primary">
-                  Cancel
-                </Button>
-                <Button type="submit" color="secondary">
-                  Submit
-                </Button>
-              </DialogActions>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </div>
+        <DialogAdd open={open} onClose={() => handleClose()} value={data} />
+      </>
     );
   }
 

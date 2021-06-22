@@ -1,31 +1,21 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
+import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 import { Link } from "react-router-dom";
 
-const useStyles = makeStyles({
-  title: {
-    flexGrow: 1,
-  },
-});
-
 export const Header = () => {
-  const classes = useStyles();
-
   return (
     <AppBar position="static">
       <Toolbar>
         <img src="pikachu.png" alt="pikachu" width={30} />
-        <Link
-          className={classes.title}
-          style={{ textDecoration: "none" }}
-          to="/"
-        >
-          <Typography variant="h5">Pokemon App</Typography>
-        </Link>
+        <Box flexGrow={1} ml={1}>
+          <Link style={{ textDecoration: "none" }} to="/">
+            <Typography variant="h5">Pokemon App</Typography>
+          </Link>
+        </Box>
         <Link style={{ textDecoration: "none" }} to="/myPokemon">
           <Button variant="contained" color="secondary">
             My Pokemon
