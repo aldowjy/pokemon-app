@@ -8,16 +8,20 @@ import { MuiThemeProvider } from "@material-ui/core/styles";
 import { theme } from "./utils/customTheme";
 import { client } from "./grapql/schema/pokemonSchema";
 import { BrowserRouter as Router } from "react-router-dom";
+import { PopupProvider } from "react-hook-popup";
+import { GlobalProvider } from "./context/GlobalState";
 
 ReactDOM.render(
   <React.StrictMode>
-    <Router>
-      <ApolloProvider client={client}>
-        <MuiThemeProvider theme={theme}>
-          <App />
-        </MuiThemeProvider>
-      </ApolloProvider>
-    </Router>
+    <ApolloProvider client={client}>
+      <MuiThemeProvider theme={theme}>
+        <PopupProvider>
+          <GlobalProvider>
+            <App />
+          </GlobalProvider>
+        </PopupProvider>
+      </MuiThemeProvider>
+    </ApolloProvider>
   </React.StrictMode>,
   document.getElementById("root")
 );

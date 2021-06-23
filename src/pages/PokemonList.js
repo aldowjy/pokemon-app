@@ -1,3 +1,4 @@
+/** @jsxImportSource @emotion/react */
 import React, { useState, useEffect } from "react";
 import { withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
@@ -10,6 +11,7 @@ import { gql, useQuery } from "@apollo/client";
 import { Link } from "react-router-dom";
 import Alert from "@material-ui/lab/Alert";
 import Grid from "@material-ui/core/Grid";
+import { css } from "@emotion/react";
 
 const StyleCard = withStyles({
   root: {
@@ -99,7 +101,9 @@ function PokemonList() {
           <Grid item xs={12} sm={6} key={pokemon.name}>
             <Link
               to={`/detail/${pokemon.name}`}
-              style={{ textDecoration: "none" }}
+              css={css`
+                text-decoration: none;
+              `}
             >
               <StyleCard>
                 <CardContent>

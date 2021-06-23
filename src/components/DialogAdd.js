@@ -8,6 +8,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import TextField from "@material-ui/core/TextField";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import { useAlert } from "../components/CustomAlert";
 
 const useStyles = makeStyles((theme) => ({
   wrapper: {
@@ -32,6 +33,7 @@ export const DialogAdd = ({ value }) => {
   const [loading, setLoading] = useState(false);
   const timer = useRef();
   const classes = useStyles();
+  const [alert] = useAlert();
 
   const checkData = (nick_name) => {
     const check_data = JSON.parse(localStorage.getItem("pokemon_history"));
@@ -66,10 +68,10 @@ export const DialogAdd = ({ value }) => {
         setLoading(false);
 
         if (caught) {
-          alert("Berhasil");
+          alert("Caught");
           setOpen(true);
         } else {
-          alert("Gagal");
+          alert("Failed to Catch");
           setOpen(false);
         }
       }, 1500);

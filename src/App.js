@@ -5,12 +5,11 @@ import PokemonList from "./pages/PokemonList";
 import PokemonDetail from "./pages/PokemonDetail";
 import MyPokemonList from "./pages/MyPokemonList";
 import Box from "@material-ui/core/Box";
-import { Switch, Route } from "react-router-dom";
-import { GlobalProvider } from './context/GlobalState';
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
 function App() {
   return (
-    <GlobalProvider>
+    <Router>
       <Header />
       <Container my={8}>
         <Box my={8}>
@@ -21,7 +20,7 @@ function App() {
           </Switch>
         </Box>
       </Container>
-    </GlobalProvider>
+    </Router>
   );
 }
 

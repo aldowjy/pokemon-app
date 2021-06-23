@@ -1,3 +1,4 @@
+/** @jsxImportSource @emotion/react */
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
@@ -9,6 +10,7 @@ import Alert from "@material-ui/lab/Alert";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
 import { DialogAdd } from "../components/DialogAdd";
+import { css } from "@emotion/react";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -55,6 +57,8 @@ const GET_DETAIL = gql`
 
 const PokemonDetail = (route) => {
   const classes = useStyles();
+
+  console.log(route.match.params);
   const { loading, error, data } = useQuery(GET_DETAIL, {
     variables: {
       name: route.match.params.name,
@@ -82,6 +86,7 @@ const PokemonDetail = (route) => {
     );
   if (error) return <Alert severity="error">Something Wrong!</Alert>;
 
+  console.log(data);
   if (data && data.pokemon) {
     const {
       pokemon: { name, sprites, types, moves },
@@ -118,7 +123,9 @@ const PokemonDetail = (route) => {
                       <Chip
                         key={index}
                         label={type.type.name}
-                        style={{ margin: "3px" }}
+                        css={css`
+                          margin: 3px;
+                        `}
                       />
                     ))}
                   </Box>
@@ -130,7 +137,9 @@ const PokemonDetail = (route) => {
                       <Chip
                         key={index}
                         label={move.move.name}
-                        style={{ margin: "3px" }}
+                        css={css`
+                          margin: 3px;
+                        `}
                       />
                     ))}
                   </Box>

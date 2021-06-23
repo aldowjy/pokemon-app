@@ -1,11 +1,13 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
 import { GlobalContext } from "../context/GlobalState";
 import Button from "@material-ui/core/Button";
+import { useAlert } from "../components/CustomAlert";
 
 export const ButtonDelete = ({ label, value, ...props }) => {
   const { removePokemon } = useContext(GlobalContext);
   const [loading, setLoading] = useState(false);
   const timer = useRef();
+  const [alert] = useAlert();
 
   useEffect(() => {
     return () => {
@@ -23,6 +25,8 @@ export const ButtonDelete = ({ label, value, ...props }) => {
       let data = JSON.parse(localStorage.getItem("pokemon_history"));
       props.onChange(data);
     }, 1500);
+
+    alert("Successfully Deleted");
   };
 
   return (
