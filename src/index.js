@@ -7,7 +7,6 @@ import { ApolloProvider } from "@apollo/client";
 import { MuiThemeProvider } from "@material-ui/core/styles";
 import { theme } from "./utils/customTheme";
 import { client } from "./grapql/schema/pokemonSchema";
-import { BrowserRouter as Router } from "react-router-dom";
 import { PopupProvider } from "react-hook-popup";
 import { GlobalProvider } from "./context/GlobalState";
 

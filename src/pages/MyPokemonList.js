@@ -5,6 +5,7 @@ import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import { ButtonDelete } from "../components/ButtonDelete";
+import Alert from "@material-ui/lab/Alert";
 
 const MyPokemonList = () => {
   const [myPokemon, setPokemon] = useState([]);
@@ -66,7 +67,7 @@ const MyPokemonList = () => {
           ))}
         </Grid>
       ) : (
-        <p>No data.</p>
+        <Alert severity="error">No Data!</Alert>
       )}
     </>
   );
