@@ -9,14 +9,13 @@ import { ButtonDelete } from "../components/ButtonDelete";
 const MyPokemonList = () => {
   const [myPokemon, setPokemon] = useState([]);
 
-  let data =
-    typeof localStorage !== "undefined"
-      ? JSON.parse(localStorage.getItem("pokemon_history"))
-      : [];
-
   useEffect(() => {
+    let data =
+      typeof localStorage !== "undefined"
+        ? JSON.parse(localStorage.getItem("pokemon_history"))
+        : [];
     setPokemon({ ...myPokemon, results: data });
-  }, []);
+  }, [myPokemon]);
 
   const handleChange = (newValue) => {
     setPokemon({ ...myPokemon, results: newValue });
@@ -24,7 +23,7 @@ const MyPokemonList = () => {
 
   return (
     <>
-      {myPokemon.results !== undefined ? (
+      {myPokemon.results && myPokemon.results.length > 0 ? (
         <Grid container spacing={3}>
           {myPokemon.results.map((pokemon, index) => (
             <Grid item xs={12} sm={6} key={index}>

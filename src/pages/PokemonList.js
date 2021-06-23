@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { withStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import Card from "@material-ui/core/Card";
@@ -36,41 +36,45 @@ const GET_POKEMONS = gql`
   }
 `;
 
-const gqlVariables = {
-  limit: 10,
-  offset: 1,
-};
-
 const defaultPokemons = {
-  status: true,
-  count: 0,
   results: [],
 };
 
-const getLocalStorage = () => {
-  let data = [];
-
-  if (typeof localStorage !== "undefined") {
-    data = JSON.parse(localStorage.getItem("pokemon_history"));
-  } else {
-    data = [];
-  }
-
-  return data;
-};
-
 function PokemonList() {
-  const [pokemons] = useState(defaultPokemons);
-  // const [page, setPage] = useState(0);
-  // const [isLoading, setLoading] = useState(false);
-  // const [isError, setError] = useState(false);
-  const myData = getLocalStorage();
-
+  const [pokemons, setPokemon] = useState(defaultPokemons);
+  const [limit, setLimit] = useState(10);
+  const [isLoading] = useState(false);
   const { loading, error, data } = useQuery(GET_POKEMONS, {
-    variables: gqlVariables,
+    variables: { limit: limit },
   });
 
-  if (loading)
+  useEffect(() => {
+    if (!loading && data) {
+      const myData =
+        typeof localStorage !== "undefined"
+          ? JSON.parse(localStorage.getItem("pokemon_history"))
+          : [];
+      let newData = JSON.parse(JSON.stringify(data.pokemons.results));
+
+      const countPokemon = (arr, val) =>
+        arr.reduce((a, v) => (v.pokemon_name === val ? a + 1 : a), 0);
+
+      if (myData != null) {
+        for (var i = 0; i < newData.length; i++) {
+          var detail = newData[i];
+          Object.assign(detail, { own: countPokemon(myData, detail.name) });
+        }
+      }
+
+      setPokemon(() => {
+        return {
+          results: [...newData],
+        };
+      });
+    }
+  }, [loading, data]);
+
+  if (loading) {
     return (
       <Grid item xs={6}>
         <Card>
@@ -85,24 +89,13 @@ function PokemonList() {
         </Card>
       </Grid>
     );
-  if (error) return <Alert severity="error">Something Wrong!</Alert>;
-
-  let newData = JSON.parse(JSON.stringify(data.pokemons.results));
-
-  const countPokemon = (arr, val) =>
-    arr.reduce((a, v) => (v.pokemon_name === val ? a + 1 : a), 0);
-
-  if (myData != null) {
-    for (var i = 0; i < newData.length; i++) {
-      var detail = newData[i];
-      Object.assign(detail, { own: countPokemon(myData, detail.name) });
-    }
   }
+  if (error) return <Alert severity="error">Something Wrong!</Alert>;
 
   return (
     <>
       <Grid container spacing={3}>
-        {newData.map((pokemon) => (
+        {pokemons.results.map((pokemon) => (
           <Grid item xs={12} sm={6} key={pokemon.name}>
             <Link
               to={`/detail/${pokemon.name}`}
@@ -133,13 +126,20 @@ function PokemonList() {
           </Grid>
         ))}
       </Grid>
-      <Grid container justify="center">
-        <Box m={2}>
-          <Button variant="contained" color="secondary" disabled={loading}>
-            Load More
-          </Button>
-        </Box>
-      </Grid>
+      {pokemons.results.length < parseInt(data.pokemons.count) ? (
+        <Grid container justify="center">
+          <Box m={2}>
+            <Button
+              variant="contained"
+              color="secondary"
+              disabled={isLoading}
+              onClick={() => setLimit((limit) => limit + 10)}
+            >
+              Load More
+            </Button>
+          </Box>
+        </Grid>
+      ) : null}
     </>
   );
 }

@@ -10,7 +10,7 @@ export const Header = () => {
   return (
     <AppBar position="static">
       <Toolbar>
-        <img src="pikachu.png" alt="pikachu" width={30} />
+        <img src="pikachu.png" alt="pikachu" width={30} height={30} />
         <Box flexGrow={1} ml={1}>
           <Link style={{ textDecoration: "none" }} to="/">
             <Typography variant="h5">Pokemon App</Typography>
