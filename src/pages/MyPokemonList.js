@@ -16,7 +16,7 @@ const MyPokemonList = () => {
         ? JSON.parse(localStorage.getItem("pokemon_history"))
         : [];
     setPokemon({ ...myPokemon, results: data });
-  }, []);
+  }, [myPokemon]);
 
   const handleChange = (newValue) => {
     setPokemon({ ...myPokemon, results: newValue });
