@@ -58,7 +58,6 @@ const GET_DETAIL = gql`
 const PokemonDetail = (route) => {
   const classes = useStyles();
 
-  console.log(route.match.params);
   const { loading, error, data } = useQuery(GET_DETAIL, {
     variables: {
       name: route.match.params.name,
@@ -86,7 +85,6 @@ const PokemonDetail = (route) => {
     );
   if (error) return <Alert severity="error">Something Wrong!</Alert>;
 
-  console.log(data);
   if (data && data.pokemon) {
     const {
       pokemon: { name, sprites, types, moves },
